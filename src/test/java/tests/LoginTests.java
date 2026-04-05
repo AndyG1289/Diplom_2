@@ -33,8 +33,8 @@ public class LoginTests extends BaseSpec {
         int statusCode = response.statusCode();
         boolean success = response.then().extract().path("success");
 
-        assertTrue(success);
         assertEquals(200, statusCode);
+        assertTrue(success);
     }
 
     @Test
@@ -47,8 +47,8 @@ public class LoginTests extends BaseSpec {
         int statusCode = response.statusCode();
         boolean success = response.then().extract().path("success");
 
-        assertFalse(success);
         assertEquals(401, statusCode);
+        assertFalse(success);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class LoginTests extends BaseSpec {
         int statusCode = response.statusCode();
         boolean success = response.then().extract().path("success");
 
-        assertFalse(success);
         assertEquals(401, statusCode);
+        assertFalse(success);
     }
 }
