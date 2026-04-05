@@ -90,8 +90,12 @@ public class OrderTests extends BaseSpec {
         Response response = orderClient.createOrderWithAuth(order, token);
 
         int statusCode = response.statusCode();
+        boolean success = response.then().extract().path("success");
+        String message = response.then().extract().path("message");
 
         assertEquals(400, statusCode);
+        assertFalse(success);
+        assertTrue(message.contains("Ingredient"));
     }
 
     @Test
