@@ -35,15 +35,17 @@ public class UserTests extends BaseSpec {
     public void createUserAlreadyExists() {
         User user = UserGenerator.getRandomUser();
 
-        userClient.createUser(user); // первый раз создаём
+        userClient.createUser(user);
 
-        Response response = userClient.createUser(user); // второй раз
+        Response response = userClient.createUser(user);
 
         int statusCode = response.statusCode();
         boolean success = response.then().extract().path("success");
+        String message = response.then().extract().path("message");
 
-        assertFalse(success);
         assertEquals(403, statusCode);
+        assertFalse(success);
+        assertEquals("User already exists", message);
     }
 
     @Test
@@ -55,8 +57,10 @@ public class UserTests extends BaseSpec {
 
         int statusCode = response.statusCode();
         boolean success = response.then().extract().path("success");
+        String message = response.then().extract().path("message");
 
-        assertFalse(success);
         assertEquals(403, statusCode);
+        assertFalse(success);
+        assertEquals("Email, password and name are required fields", message);
     }
 }
