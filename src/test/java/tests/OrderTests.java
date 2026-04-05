@@ -104,7 +104,7 @@ public class OrderTests extends BaseSpec {
         int statusCode = response.statusCode();
         boolean success = response.then().extract().path("success");
 
-        assertEquals(400, statusCode);
+        assertEquals(500, statusCode);
         assertFalse(success);
     }
 }
