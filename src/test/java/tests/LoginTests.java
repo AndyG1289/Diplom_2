@@ -38,9 +38,23 @@ public class LoginTests extends BaseSpec {
     }
 
     @Test
-    @DisplayName("Логин пользователя — неверные данные")
-    public void loginWithInvalidCredentials() {
-        User wrongUser = new User("wrong@yandex.ru", "wrongpassword", "Andrey");
+    @DisplayName("Логин пользователя — неверный email")
+    public void loginWithInvalidEmail() {
+        User wrongUser = new User("wrong@yandex.ru", user.getPassword(), user.getName());
+
+        Response response = userClient.loginUser(wrongUser);
+
+        int statusCode = response.statusCode();
+        boolean success = response.then().extract().path("success");
+
+        assertFalse(success);
+        assertEquals(401, statusCode);
+    }
+
+    @Test
+    @DisplayName("Логин пользователя — неверный пароль")
+    public void loginWithInvalidPassword() {
+        User wrongUser = new User(user.getEmail(), "wrongpassword", user.getName());
 
         Response response = userClient.loginUser(wrongUser);
 
