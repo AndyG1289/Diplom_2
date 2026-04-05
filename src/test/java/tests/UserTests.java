@@ -63,4 +63,36 @@ public class UserTests extends BaseSpec {
         assertFalse(success);
         assertEquals("Email, password and name are required fields", message);
     }
+
+    @Test
+    @DisplayName("Создание пользователя — отсутствует имя")
+    public void createUserWithoutName() {
+        User user = new User("test@yandex.ru", "password123", null);
+
+        Response response = userClient.createUser(user);
+
+        int statusCode = response.statusCode();
+        boolean success = response.then().extract().path("success");
+        String message = response.then().extract().path("message");
+
+        assertEquals(403, statusCode);
+        assertFalse(success);
+        assertEquals("Email, password and name are required fields", message);
+    }
+
+    @Test
+    @DisplayName("Создание пользователя — отсутствует пароль")
+    public void createUserWithoutPassword() {
+        User user = new User("test@yandex.ru", null, "Andrey");
+
+        Response response = userClient.createUser(user);
+
+        int statusCode = response.statusCode();
+        boolean success = response.then().extract().path("success");
+        String message = response.then().extract().path("message");
+
+        assertEquals(403, statusCode);
+        assertFalse(success);
+        assertEquals("Email, password and name are required fields", message);
+    }
 }
