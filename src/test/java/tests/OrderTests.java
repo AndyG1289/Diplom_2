@@ -35,11 +35,11 @@ public class OrderTests extends BaseSpec {
         IngredientClient ingredientClient = new IngredientClient();
         Response ingredientsResponse = ingredientClient.getIngredients();
 
-        String ingredientId1 = ingredientsResponse.then().extract().path("data[0]._id");
-        String ingredientId2 = ingredientsResponse.then().extract().path("data[1]._id");
+        String firstIngredientId = ingredientsResponse.then().extract().path("data[0]._id");
+        String secondIngredientId = ingredientsResponse.then().extract().path("data[1]._id");
 
         Map<String, Object> body = new HashMap<>();
-        body.put("ingredients", Arrays.asList(ingredientId1, ingredientId2));
+        body.put("ingredients", Arrays.asList(firstIngredientId, secondIngredientId));
 
         Response response = orderClient.createOrderWithAuth(body, token);
 
