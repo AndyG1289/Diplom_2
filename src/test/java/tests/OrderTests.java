@@ -3,53 +3,64 @@ package tests;
 import client.IngredientClient;
 import client.OrderClient;
 import client.UserClient;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
+import model.Order;
 import model.User;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import specification.BaseSpec;
 import utils.UserGenerator;
-import io.qameta.allure.junit4.DisplayName;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class OrderTests extends BaseSpec {
 
-    private final UserClient userClient = new UserClient();
-    private final OrderClient orderClient = new OrderClient();
+    private UserClient userClient;
+    private OrderClient orderClient;
+    private User user;
+    private String token;
+
+    @Before
+    public void setUp() {
+        userClient = new UserClient();
+        orderClient = new OrderClient();
+        user = UserGenerator.getRandomUser();
+        userClient.createUser(user);
+        token = userClient.getAccessToken(user);
+    }
+
+    @After
+    public void tearDown() {
+        if (token != null) {
+            userClient.deleteUser(token);
+        }
+    }
 
     @Test
     @DisplayName("Создание заказа с авторизацией")
     public void createOrderWithAuth() {
-        User user = UserGenerator.getRandomUser();
-        userClient.createUser(user);
-
-        String token = userClient.getAccessToken(user);
-
         IngredientClient ingredientClient = new IngredientClient();
         Response ingredientsResponse = ingredientClient.getIngredients();
 
         String firstIngredientId = ingredientsResponse.then().extract().path("data[0]._id");
         String secondIngredientId = ingredientsResponse.then().extract().path("data[1]._id");
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("ingredients", Arrays.asList(firstIngredientId, secondIngredientId));
+        Order order = new Order(Arrays.asList(firstIngredientId, secondIngredientId));
 
-        Response response = orderClient.createOrderWithAuth(body, token);
-
-        response.prettyPrint();
+        Response response = orderClient.createOrderWithAuth(order, token);
 
         int statusCode = response.statusCode();
         boolean success = response.then().extract().path("success");
 
-        assertTrue(success);
         assertEquals(200, statusCode);
+        assertTrue(success);
     }
 
     @Test
@@ -60,30 +71,23 @@ public class OrderTests extends BaseSpec {
 
         String ingredientId = ingredientsResponse.then().extract().path("data[0]._id");
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("ingredients", Arrays.asList(ingredientId));
+        Order order = new Order(Arrays.asList(ingredientId));
 
-        Response response = orderClient.createOrder(body);
+        Response response = orderClient.createOrder(order);
 
         int statusCode = response.statusCode();
         boolean success = response.then().extract().path("success");
 
-        assertTrue(success); // важно: API позволяет создавать без авторизации
         assertEquals(200, statusCode);
+        assertTrue(success);
     }
 
     @Test
     @DisplayName("Создание заказа без ингредиентов")
     public void createOrderWithoutIngredients() {
-        User user = UserGenerator.getRandomUser();
-        userClient.createUser(user);
+        Order order = new Order(new ArrayList<>());
 
-        String token = userClient.getAccessToken(user);
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("ingredients", new ArrayList<>());
-
-        Response response = orderClient.createOrderWithAuth(body, token);
+        Response response = orderClient.createOrderWithAuth(order, token);
 
         int statusCode = response.statusCode();
 
@@ -93,20 +97,14 @@ public class OrderTests extends BaseSpec {
     @Test
     @DisplayName("Создание заказа с неверным хешем ингредиентов")
     public void createOrderWithInvalidIngredients() {
-        User user = UserGenerator.getRandomUser();
-        userClient.createUser(user);
+        Order order = new Order(Arrays.asList("invalid_hash"));
 
-        String token = userClient.getAccessToken(user);
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("ingredients", Arrays.asList("invalid_hash"));
-
-        Response response = orderClient.createOrderWithAuth(body, token);
+        Response response = orderClient.createOrderWithAuth(order, token);
 
         int statusCode = response.statusCode();
         boolean success = response.then().extract().path("success");
 
+        assertEquals(400, statusCode);
         assertFalse(success);
-        assertEquals(400, statusCode); // API может вернуть 500
     }
 }
