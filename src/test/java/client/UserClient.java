@@ -37,4 +37,11 @@ public class UserClient {
         // убираем "Bearer "
         return fullToken.replace("Bearer ", "");
     }
+
+    @Step("Удаление пользователя")
+    public Response deleteUser(String token) {
+        return given()
+                .header("Authorization", "Bearer " + token)
+                .delete("/api/auth/user");
+    }
 }

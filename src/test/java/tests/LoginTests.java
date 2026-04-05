@@ -4,6 +4,7 @@ import client.UserClient;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import model.User;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import specification.BaseSpec;
@@ -17,12 +18,21 @@ public class LoginTests extends BaseSpec {
 
     private UserClient userClient;
     private User user;
+    private String token;
 
     @Before
     public void setUp() {
         userClient = new UserClient();
         user = UserGenerator.getRandomUser();
         userClient.createUser(user);
+        token = userClient.getAccessToken(user);
+    }
+
+    @After
+    public void tearDown() {
+        if (token != null) {
+            userClient.deleteUser(token);
+        }
     }
 
     @Test
