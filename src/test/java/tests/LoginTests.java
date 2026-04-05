@@ -1,12 +1,13 @@
 package tests;
 
 import client.UserClient;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import model.User;
+import org.junit.Before;
 import org.junit.Test;
 import specification.BaseSpec;
 import utils.UserGenerator;
-import io.qameta.allure.junit4.DisplayName;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -14,15 +15,19 @@ import static org.junit.Assert.assertTrue;
 
 public class LoginTests extends BaseSpec {
 
-    private final UserClient userClient = new UserClient();
+    private UserClient userClient;
+    private User user;
+
+    @Before
+    public void setUp() {
+        userClient = new UserClient();
+        user = UserGenerator.getRandomUser();
+        userClient.createUser(user);
+    }
 
     @Test
     @DisplayName("Логин пользователя — успешный")
     public void loginSuccessfully() {
-        User user = UserGenerator.getRandomUser();
-
-        userClient.createUser(user); // сначала создаём
-
         Response response = userClient.loginUser(user);
 
         int statusCode = response.statusCode();
@@ -35,9 +40,9 @@ public class LoginTests extends BaseSpec {
     @Test
     @DisplayName("Логин пользователя — неверные данные")
     public void loginWithInvalidCredentials() {
-        User user = new User("wrong@yandex.ru", "wrongpassword", "Andrey");
+        User wrongUser = new User("wrong@yandex.ru", "wrongpassword", "Andrey");
 
-        Response response = userClient.loginUser(user);
+        Response response = userClient.loginUser(wrongUser);
 
         int statusCode = response.statusCode();
         boolean success = response.then().extract().path("success");
