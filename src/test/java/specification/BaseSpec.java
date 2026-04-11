@@ -7,13 +7,6 @@ public class BaseSpec {
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "https://stellarburgers.education-services.ru";
-
-        RestAssured.config = RestAssured.config()
-                .httpClient(
-                        io.restassured.config.HttpClientConfig.httpClientConfig()
-                                .setParam("http.connection.timeout", 5000)
-                                .setParam("http.socket.timeout", 5000)
-                );
+        RestAssured.baseURI = "http://stellarburgers.education-services.ru";
     }
 }

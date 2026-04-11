@@ -1,8 +1,8 @@
 package client;
 
+import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import model.User;
-import io.qameta.allure.Step;
 
 import static io.restassured.RestAssured.given;
 
@@ -10,6 +10,7 @@ public class UserClient {
 
     private static final String CREATE_USER = "/api/auth/register";
     private static final String LOGIN_USER = "/api/auth/login";
+    private static final String DELETE_USER = "/api/auth/user";
 
     @Step("Создание пользователя")
     public Response createUser(User user) {
@@ -34,7 +35,6 @@ public class UserClient {
                 .extract()
                 .path("accessToken");
 
-        // убираем "Bearer "
         return fullToken.replace("Bearer ", "");
     }
 
@@ -42,6 +42,6 @@ public class UserClient {
     public Response deleteUser(String token) {
         return given()
                 .header("Authorization", "Bearer " + token)
-                .delete("/api/auth/user");
+                .delete(DELETE_USER);
     }
 }
