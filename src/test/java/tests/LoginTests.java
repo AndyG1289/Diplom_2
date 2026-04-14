@@ -50,15 +50,20 @@ public class LoginTests extends BaseSpec {
     @Test
     @DisplayName("Логин пользователя — неверный email")
     public void loginWithInvalidEmail() {
+        User user = UserGenerator.getRandomUser();
+        userClient.createUser(user);
+
         User wrongUser = new User("wrong@yandex.ru", user.getPassword(), user.getName());
 
         Response response = userClient.loginUser(wrongUser);
 
         int statusCode = response.statusCode();
         boolean success = response.then().extract().path("success");
+        String message = response.then().extract().path("message");
 
         assertEquals(401, statusCode);
         assertFalse(success);
+        assertEquals("email or password are incorrect", message);
     }
 
     @Test
@@ -70,8 +75,10 @@ public class LoginTests extends BaseSpec {
 
         int statusCode = response.statusCode();
         boolean success = response.then().extract().path("success");
+        String message = response.then().extract().path("message");
 
         assertEquals(401, statusCode);
         assertFalse(success);
+        assertEquals("email or password are incorrect", message);
     }
 }

@@ -107,8 +107,10 @@ public class OrderTests extends BaseSpec {
 
         int statusCode = response.statusCode();
         boolean success = response.then().extract().path("success");
+        String message = response.then().extract().path("message");
 
         assertEquals(500, statusCode);
         assertFalse(success);
+        assertTrue(message.length() > 0); // сообщение есть
     }
 }
