@@ -7,6 +7,6 @@ public class BaseSpec {
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "http://stellarburgers.education-services.ru";
+        RestAssured.baseURI = "https://stellarburgers.education-services.ru";
     }
 }

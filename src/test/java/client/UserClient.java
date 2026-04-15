@@ -3,6 +3,7 @@ package client;
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import model.User;
+import model.LoginRequest;
 
 import static io.restassured.RestAssured.given;
 
@@ -16,15 +17,23 @@ public class UserClient {
     public Response createUser(User user) {
         return given()
                 .header("Content-type", "application/json")
+                .accept("application/json")
                 .body(user)
                 .post(CREATE_USER);
     }
 
     @Step("Логин пользователя")
     public Response loginUser(User user) {
+
+        LoginRequest loginRequest = new LoginRequest(
+                user.getEmail(),
+                user.getPassword()
+        );
+
         return given()
                 .header("Content-type", "application/json")
-                .body(user)
+                .accept("application/json")
+                .body(loginRequest)
                 .post(LOGIN_USER);
     }
 
@@ -42,6 +51,7 @@ public class UserClient {
     public Response deleteUser(String token) {
         return given()
                 .header("Authorization", "Bearer " + token)
+                .accept("application/json")
                 .delete(DELETE_USER);
     }
 }
